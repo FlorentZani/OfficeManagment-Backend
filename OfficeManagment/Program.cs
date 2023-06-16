@@ -1,7 +1,11 @@
 global using OfficeManagment.Data;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
+
 
 var builder = WebApplication.CreateBuilder(args);
+
+
 
 // Add services to the container.
 
@@ -16,12 +20,17 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+builder.Host.UseSerilog((DbContext, IConfiguration) => 
+    IConfiguration.ReadFrom.Configuration(DbContext.Configuration));
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 
