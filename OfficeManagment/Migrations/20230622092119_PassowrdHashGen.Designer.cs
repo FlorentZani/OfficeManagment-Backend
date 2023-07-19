@@ -12,15 +12,15 @@ using OfficeManagment.Data;
 namespace OfficeManagment.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230610095634_Firstmigration")]
-    partial class Firstmigration
+    [Migration("20230622092119_PassowrdHashGen")]
+    partial class PassowrdHashGen
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.5")
+                .HasAnnotation("ProductVersion", "7.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -85,6 +85,10 @@ namespace OfficeManagment.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

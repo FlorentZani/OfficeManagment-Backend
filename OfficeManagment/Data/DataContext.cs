@@ -10,21 +10,27 @@ namespace OfficeManagment.Data
         public DbSet<User> User { get; set; }
         public DbSet<Role> Role { get; set; }
         public DbSet<Projects> Projects { get; set; }
-
+        public DbSet<Position> Positions { get; set; }
         public DbSet<UserProjects> UserProjects { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserProjects>()
                 .HasOne(b => b.User)
-                .WithMany(a => a.Project)
+                .WithMany(a => a.UserProjects)
                 .HasForeignKey(a=>a.UserId);
             
             modelBuilder.Entity<UserProjects>()
                 .HasOne(b => b.Projects)
-                .WithMany(a => a.DevelopersWorking)
+                .WithMany(a => a.UserProjects)
                 .HasForeignKey(a=>a.ProjectId);
+
+            modelBuilder.Entity<UserProjects>()
+                .HasOne(up => up.Position)
+                .WithMany(p => p.UserProjects)
+                .HasForeignKey(up => up.PositionId);
 
             modelBuilder.Entity<UserRole>()
                 .HasOne(b => b.User)
@@ -36,6 +42,8 @@ namespace OfficeManagment.Data
                 .HasOne(b => b.Roles)
                 .WithMany(a => a.Users)
                 .HasForeignKey(a => a.RoleId);
+
+            
 
 
         }

@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using OfficeManagment.Model;
+using System.Security.Cryptography;
 
 namespace OfficeManagment.Controllers
 {
@@ -7,5 +9,6 @@ namespace OfficeManagment.Controllers
     [ApiController]
     public class OMController : ControllerBase
     {
+        
     }
 }

@@ -6,6 +6,6 @@ namespace OfficeManagment.Model
     {
         [Key]
         public Guid Id { get; set; }
-        public bool IsDeleted { get; set; }
+        public bool IsDeleted { get; set; } = false;
     }
 }

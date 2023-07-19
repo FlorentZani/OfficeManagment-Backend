@@ -1,7 +1,11 @@
 global using OfficeManagment.Data;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
-
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,14 +18,34 @@ builder.Services.AddDbContext<DataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        Description = "Standart Authorization header using Bearer scheme (\"bearer {token}\")",
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+}); 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8
+            .GetBytes(builder.Configuration.GetSection("AppSettings:Token").Value)),
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
 
 var app = builder.Build();
-
-builder.Host.UseSerilog((DbContext, IConfiguration) => 
-    IConfiguration.ReadFrom.Configuration(DbContext.Configuration));
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -30,9 +54,11 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseSerilogRequestLogging();
+
 
 app.UseHttpsRedirection();
+
+app.UseAuthentication();
 
 app.UseAuthorization();
 
