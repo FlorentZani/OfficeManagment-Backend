@@ -6,11 +6,24 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace OfficeManagment.Migrations
 {
     /// <inheritdoc />
-    public partial class Firstmigration : Migration
+    public partial class firt : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Positions",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Positions", x => x.Id);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Projects",
                 columns: table => new
@@ -45,8 +58,11 @@ namespace OfficeManagment.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Username = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    passwordHash = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
+                    passwordSalt = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -61,6 +77,7 @@ namespace OfficeManagment.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     ProjectId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    PositionId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     WorkingHours = table.Column<int>(type: "int", nullable: false),
                     ProgrammingLanguage = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     IsDeleted = table.Column<bool>(type: "bit", nullable: false)
@@ -68,6 +85,12 @@ namespace OfficeManagment.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_UserProjects", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserProjects_Positions_PositionId",
+                        column: x => x.PositionId,
+                        principalTable: "Positions",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_UserProjects_Projects_ProjectId",
                         column: x => x.ProjectId,
@@ -109,6 +132,11 @@ namespace OfficeManagment.Migrations
                 });
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserProjects_PositionId",
+                table: "UserProjects",
+                column: "PositionId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_UserProjects_ProjectId",
                 table: "UserProjects",
                 column: "ProjectId");
@@ -137,6 +165,9 @@ namespace OfficeManagment.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserRoles");
+
+            migrationBuilder.DropTable(
+                name: "Positions");
 
             migrationBuilder.DropTable(
                 name: "Projects");

@@ -12,18 +12,36 @@ using OfficeManagment.Data;
 namespace OfficeManagment.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230610095634_Firstmigration")]
-    partial class Firstmigration
+    [Migration("20230719125439_unkion")]
+    partial class unkion
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.5")
+                .HasAnnotation("ProductVersion", "7.0.8")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("OfficeManagment.Model.Position", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Positions");
+                });
 
             modelBuilder.Entity("OfficeManagment.Model.Projects", b =>
                 {
@@ -88,6 +106,18 @@ namespace OfficeManagment.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<byte[]>("passwordHash")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<byte[]>("passwordSalt")
+                        .IsRequired()
+                        .HasColumnType("varbinary(max)");
+
                     b.HasKey("Id");
 
                     b.ToTable("User");
@@ -101,6 +131,9 @@ namespace OfficeManagment.Migrations
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<Guid>("PositionId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ProgrammingLanguage")
                         .IsRequired()
@@ -116,6 +149,8 @@ namespace OfficeManagment.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PositionId");
 
                     b.HasIndex("ProjectId");
 
@@ -150,6 +185,12 @@ namespace OfficeManagment.Migrations
 
             modelBuilder.Entity("OfficeManagment.Model.UserProjects", b =>
                 {
+                    b.HasOne("OfficeManagment.Model.Position", "Position")
+                        .WithMany("UserProjects")
+                        .HasForeignKey("PositionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("OfficeManagment.Model.Projects", "Projects")
                         .WithMany("UserProjects")
                         .HasForeignKey("ProjectId")
@@ -161,6 +202,8 @@ namespace OfficeManagment.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Position");
 
                     b.Navigation("Projects");
 
@@ -186,6 +229,11 @@ namespace OfficeManagment.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("OfficeManagment.Model.Position", b =>
+                {
+                    b.Navigation("UserProjects");
+                });
+
             modelBuilder.Entity("OfficeManagment.Model.Projects", b =>
                 {
                     b.Navigation("UserProjects");
@@ -198,9 +246,9 @@ namespace OfficeManagment.Migrations
 
             modelBuilder.Entity("OfficeManagment.Model.User", b =>
                 {
-                    b.Navigation("UserProjects");
-
                     b.Navigation("Role");
+
+                    b.Navigation("UserProjects");
                 });
 #pragma warning restore 612, 618
         }

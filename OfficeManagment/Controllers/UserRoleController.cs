@@ -29,9 +29,7 @@ namespace OfficeManagment.Controllers
             {
                 userRoleId = userRoles.Id,
                 UserId = userRoles.UserId,
-                UserName = userRoles.User.Name,
                 RoleId = userRoles.RoleId,
-                RoleName = userRoles.Roles.FullName
             }).ToList();
 
             return Ok(userRolesData);
@@ -54,9 +52,7 @@ namespace OfficeManagment.Controllers
             var userRoleData = new
             {
                 UserId = userRole.UserId,
-                UserName = userRole.User.Name,
                 RoleId = userRole.RoleId,
-                RoleName = userRole.Roles.FullName
             };
 
             return Ok(userRoleData);

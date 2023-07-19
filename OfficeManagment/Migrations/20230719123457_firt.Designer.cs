@@ -12,8 +12,8 @@ using OfficeManagment.Data;
 namespace OfficeManagment.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20230718104246_Relationship")]
-    partial class Relationship
+    [Migration("20230719123457_firt")]
+    partial class firt
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -126,6 +126,7 @@ namespace OfficeManagment.Migrations
             modelBuilder.Entity("OfficeManagment.Model.UserProjects", b =>
                 {
                     b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
@@ -148,6 +149,8 @@ namespace OfficeManagment.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PositionId");
 
                     b.HasIndex("ProjectId");
 
@@ -184,7 +187,7 @@ namespace OfficeManagment.Migrations
                 {
                     b.HasOne("OfficeManagment.Model.Position", "Position")
                         .WithMany("UserProjects")
-                        .HasForeignKey("Id")
+                        .HasForeignKey("PositionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 

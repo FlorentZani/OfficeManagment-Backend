@@ -5,25 +5,18 @@
 namespace OfficeManagment.Migrations
 {
     /// <inheritdoc />
-    public partial class TypeOfUser : Migration
+    public partial class umdisand : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                name: "TypeOfUser",
-                table: "User",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "");
+
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "TypeOfUser",
-                table: "User");
+
         }
     }
 }

@@ -9,7 +9,7 @@ namespace OfficeManagment.DTOs
         public string Name { get; set; }
         public string LastName { get; set; }
 
-        
+
 
 
     }

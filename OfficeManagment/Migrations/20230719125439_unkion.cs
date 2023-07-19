@@ -5,7 +5,7 @@
 namespace OfficeManagment.Migrations
 {
     /// <inheritdoc />
-    public partial class PassowrdHashGen : Migration
+    public partial class unkion : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

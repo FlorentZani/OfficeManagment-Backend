@@ -68,8 +68,10 @@ namespace OfficeManagment.Controllers
             var newUserProject = new UserProjects();
             newUserProject.ProjectId = request.ProjectId;
             newUserProject.UserId = request.UserId;
+            newUserProject.PositionId = request.PositionId;
             newUserProject.WorkingHours = request.WorkingHours;
             newUserProject.ProgrammingLanguage = request.ProgrammingLanguage;
+           
 
 
             _context.UserProjects.Add(newUserProject);
