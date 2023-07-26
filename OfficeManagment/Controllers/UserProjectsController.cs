@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using OfficeManagment.DTOs;
 using OfficeManagment.Model;
 
@@ -11,7 +12,7 @@ namespace OfficeManagment.Controllers
     public class UserProjectsController : ControllerBase
     {
         private readonly DataContext _context;
-        public UserProjectsController(DataContext context) 
+        public UserProjectsController(DataContext context)
         {
             _context = context;
         }
@@ -32,7 +33,9 @@ namespace OfficeManagment.Controllers
                 UserId = userProjects.UserId,
                 UserName = userProjects.User.Name,
                 ProgrammingLanguage = userProjects.ProgrammingLanguage,
-                WorkingHours = userProjects.WorkingHours
+                WorkingHours = userProjects.WorkingHours,
+                PositionIds = userProjects.PositionIds
+
 
             }).ToList();
 
@@ -48,42 +51,50 @@ namespace OfficeManagment.Controllers
                 .Include(x => x.User)
                 .FirstOrDefaultAsync(x => x.Id == id);
 
-            var userProjectData =  new
+            var userProjectData = new
             {
                 ProjectName = userProject.Projects.Name,
                 ProjectId = userProject.ProjectId,
                 UserId = userProject.UserId,
                 UserName = userProject.User.Name,
                 ProgrammingLanguage = userProject.ProgrammingLanguage,
-                WorkingHours = userProject.WorkingHours
+                WorkingHours = userProject.WorkingHours,
+                PositionIds = userProject.PositionIds
 
             };
             return Ok(userProjectData);
         }
         //Add a new UserProject
-        [HttpPost("AddUserProject")]
-        public async Task<ActionResult> Add(UserProjectsDTO request)
+        [HttpPost]
+        public async Task<ActionResult<UserProjects>> PostUserProject(UserProjectsDTO userProjectDto)
         {
-            
-            var newUserProject = new UserProjects();
-            newUserProject.ProjectId = request.ProjectId;
-            newUserProject.UserId = request.UserId;
-            newUserProject.PositionId = request.PositionId;
-            newUserProject.WorkingHours = request.WorkingHours;
-            newUserProject.ProgrammingLanguage = request.ProgrammingLanguage;
-           
+            var positions = await _context.Positions.Where(p => userProjectDto.PositionIds.Contains(p.Id)).ToListAsync();
 
+            if (positions.Count != userProjectDto.PositionIds.Count)
+            {
+                return BadRequest("GUID dosent match with Positions ID");
+            }
 
-            _context.UserProjects.Add(newUserProject);
-            await _context.SaveChangesAsync(); 
+            var userProject = new UserProjects
+            {
+                ProjectId = userProjectDto.ProjectId,
+                UserId = userProjectDto.UserId,
+                PositionIds = userProjectDto.PositionIds,
+                WorkingHours = userProjectDto.WorkingHours,
+                ProgrammingLanguage = userProjectDto.ProgrammingLanguage,
+
+            };
+
+            _context.UserProjects.Add(userProject);
+            await _context.SaveChangesAsync();
 
             return Ok("UserProject Added");
-            
         }
+
 
         //Update UserProjects
         [HttpPut("UpdateUserProject/{id}")]
-        public async Task<ActionResult> Update(Guid id ,UserProjectsDTO request)
+        public async Task<ActionResult> Update(Guid id, UserProjectsDTO request)
         {
             var UpdatedUserProject = await _context.UserProjects.FindAsync(id);
 
@@ -93,10 +104,11 @@ namespace OfficeManagment.Controllers
             }
 
             UpdatedUserProject.ProjectId = request.ProjectId;
-            UpdatedUserProject.UserId= request.UserId;
-            UpdatedUserProject.WorkingHours= request.WorkingHours;
-            UpdatedUserProject.ProgrammingLanguage= request.ProgrammingLanguage;
-            
+            UpdatedUserProject.UserId = request.UserId;
+            UpdatedUserProject.PositionIds = request.PositionIds;
+            UpdatedUserProject.WorkingHours = request.WorkingHours;
+            UpdatedUserProject.ProgrammingLanguage = request.ProgrammingLanguage;
+
 
             await _context.SaveChangesAsync();
 
@@ -105,7 +117,7 @@ namespace OfficeManagment.Controllers
 
         //Delete UserProjects
         [HttpDelete("DeleteUserProject/{id}")]
-        public async Task<ActionResult> Delete (Guid id)
+        public async Task<ActionResult> Delete(Guid id)
         {
             var UserProject = await _context.UserProjects.FindAsync(id);
             if (UserProject == null)

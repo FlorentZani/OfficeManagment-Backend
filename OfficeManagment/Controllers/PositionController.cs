@@ -49,7 +49,7 @@ namespace OfficeManagment.Controllers
         }
 
 
-            [HttpPost]
+        [HttpPost]
         public async Task<IActionResult> AddPosition(PositionDTO request)
         {
             if (!ModelState.IsValid)

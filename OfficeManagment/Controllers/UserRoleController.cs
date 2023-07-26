@@ -90,6 +90,22 @@ namespace OfficeManagment.Controllers
             return Ok("UserRole Updated!");
         }
 
+        //Delete UserRole
+        [HttpDelete("Delete User/{id}")]
+
+        public async Task<IActionResult> DeleteUser(Guid id)
+        {
+            var userRole = await _context.User.FindAsync(id);
+            if (userRole == null)
+            {
+                return BadRequest("User not found!");
+            }
+
+            _context.User.Remove(userRole);
+            await _context.SaveChangesAsync();
+
+            return Ok("User delted successfully!");
+        }
 
 
     }

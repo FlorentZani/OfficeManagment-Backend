@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using OfficeManagment.Model;
 
 namespace OfficeManagment.Data
@@ -14,23 +15,32 @@ namespace OfficeManagment.Data
         public DbSet<UserProjects> UserProjects { get; set; }
         public DbSet<UserRole> UserRoles { get; set; }
         
+        
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<UserProjects>()
                 .HasOne(b => b.User)
                 .WithMany(a => a.UserProjects)
-                .HasForeignKey(a=>a.UserId);
-            
+                .HasForeignKey(a => a.UserId);
+
             modelBuilder.Entity<UserProjects>()
                 .HasOne(b => b.Projects)
                 .WithMany(a => a.UserProjects)
-                .HasForeignKey(a=>a.ProjectId);
+                .HasForeignKey(a => a.ProjectId);
+
+            //modelBuilder.Entity<UserProjects>()
+            //    .HasOne(up => up.Position)
+            //    .WithMany(p => p.UserProjects)
+            //    .HasForeignKey(up => up.PositionIds);
+
 
             modelBuilder.Entity<UserProjects>()
-                .HasOne(up => up.Position)
-                .WithMany(p => p.UserProjects)
-                .HasForeignKey(up => up.PositionId);
+                .Property(up => up.PositionIds)
+                .HasConversion(
+                    v => JsonConvert.SerializeObject(v),
+                    v => JsonConvert.DeserializeObject<List<Guid>>(v))
+                .HasColumnType("nvarchar(max)");
 
             modelBuilder.Entity<UserRole>()
                 .HasOne(b => b.User)

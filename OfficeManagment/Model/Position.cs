@@ -4,8 +4,8 @@
     {
         public string Name { get; set; }
 
-        public List<UserProjects>  UserProjects { get; set; }
-        
+        //public List<UserProjects> UserProjects { get; set; }
+
 
     }
 }

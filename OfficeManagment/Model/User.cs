@@ -12,7 +12,7 @@ namespace OfficeManagment.Model
 
         public byte[] passwordSalt { get; set; }
         public List<UserRole> Role { get; set; }
-        public List<UserProjects> UserProjects { get; set; } 
+        public List<UserProjects> UserProjects { get; set; }
 
     }
 }
