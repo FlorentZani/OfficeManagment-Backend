@@ -46,7 +46,7 @@ namespace OfficeManagment.Controllers
 
         }
 
-        //Add another position to a UserProject 
+        //Add another position to a UserProject.
         [HttpPut("AddAnotherPositionToUserProject/{id}")]
         public async Task<IActionResult> AddPositionToUserProject(Guid id, Guid positionId)
         {
