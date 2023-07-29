@@ -16,69 +16,40 @@ namespace OfficeManagment.Controllers
         {
             _context = context;
         }
-
-        //Method to add another User to the project 
-        //Method created to be used for Authorization
-        [HttpPost("AddUserToProject")]
-        public async Task<ActionResult> AddUserToProject(UserProjectsDTO userProjectDto)
+        //Find Users By Name
+        [HttpGet("FindByName/{name}")]
+        public async Task<ActionResult<object>> FindByName(string name)
         {
-            var positions = await _context.Positions.Where(p => userProjectDto.PositionIds.Contains(p.Id)).ToListAsync();
+            
+            var users = await _context.User
+                .Where(u => u.Name == name)
+                .Include(u => u.UserProjects)
+                    .ThenInclude(up => up.Projects)
+                .ToListAsync();
 
-            if (positions.Count != userProjectDto.PositionIds.Count)
+            var positions = await _context.Positions.ToListAsync();
+
+            
+            var userData = users.Select(user => new
             {
-                return BadRequest("GUID dosent match with Positions ID");
-            }
+                UserId = user.Id,
+                UserName = user.Name,
+                Projects = user.UserProjects.Select(up => new
+                {
+                    ProjectId = up.ProjectId,
+                    ProjectName = up.Projects.Name,
+                    Positions = up.PositionIds.Select(id =>
+                    {
+                        var position = positions.FirstOrDefault(p => p.Id == id);
+                        return position != null ? $"Position Name: {position.Name}  | Position Id: {position.Id}" : "Position not found";
+                    }).ToList()
+                }).ToList()
+            }).ToList();
 
-            var userProject = new UserProjects
-            {
-                ProjectId = userProjectDto.ProjectId,
-                UserId = userProjectDto.UserId,
-                PositionIds = userProjectDto.PositionIds,
-                WorkingHours = userProjectDto.WorkingHours,
-                ProgrammingLanguage = userProjectDto.ProgrammingLanguage,
-
-            };
-
-            _context.UserProjects.Add(userProject);
-            await _context.SaveChangesAsync();
-
-            return Ok(userProject);
-
+            return Ok(userData);
         }
 
-        //Add another position to a UserProject.
-        [HttpPut("AddAnotherPositionToUserProject/{id}")]
-        public async Task<IActionResult> AddPositionToUserProject(Guid id, Guid positionId)
-        {
-            var userProject = await _context.UserProjects.FindAsync(id);
 
-            if (userProject == null)
-            {
-                return NotFound();
-            }
-
-            var positionExists = await _context.Positions.AnyAsync(x => x.Id == positionId);
-
-            if (!positionExists)
-            {
-                return BadRequest("Position does not exist");
-            }
-
-            var positionIds = userProject.PositionIds;
-
-            if (positionIds.Contains(positionId))
-            {
-                return BadRequest("Position already exists for this UserProject");
-            }
-
-            positionIds.Add(positionId);
-
-            userProject.PositionIds = positionIds;
-
-            await _context.SaveChangesAsync();
-
-            return NoContent();
-        }
 
 
 
