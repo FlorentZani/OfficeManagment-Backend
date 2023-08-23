@@ -47,9 +47,20 @@ namespace OfficeManagment.Controllers
                 passwordSalt = passwordSalt,
                 passwordHash = passwordHash
             };
-
             _context.User.Add(newUser);
             await _context.SaveChangesAsync();
+
+            UserRole newUserRole = new UserRole
+            {
+                UserId = newUser.Id,
+                RoleId = Guid.Parse("34f98882-c607-41aa-e8b6-08db98b5673b"),
+
+            };
+
+            _context.UserRoles.Add(newUserRole);
+            await _context.SaveChangesAsync();
+            
+            
 
             return Ok();
         }

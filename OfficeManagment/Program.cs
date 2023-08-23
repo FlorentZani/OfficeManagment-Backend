@@ -45,6 +45,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+var cors = Environment.GetEnvironmentVariable("CORS");
+var origins = cors?.Split(',', StringSplitOptions.RemoveEmptyEntries);
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(
+    builder =>
+    {
+        builder.WithOrigins("http://localhost:5173",
+                                "http://localhost",
+                                "http://127.0.0.1:5173",
+                                "https://zedzoneadmin.netlify.app")
+               .AllowAnyHeader()
+               .AllowAnyMethod()
+               .AllowCredentials();
+    });
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -53,8 +72,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+//corse
 
 
+app.UseCors();
 
 app.UseHttpsRedirection();
 
